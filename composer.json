@@ -1,0 +1,16 @@
+{
+    "name": "luffyzhao/luffy-db",
+    "authors": [
+        {
+            "name": "luffyzhao",
+            "email": "luffyzhao@vip.126.com"
+        }
+    ],
+    "require": {
+        "phpunit/phpunit": "4.8.*",
+        "php": ">=7.0.0"
+    },
+    "autoload": {
+        "psr-4": {"luffyzhao\\db\\": "src/"}
+    }
+}
