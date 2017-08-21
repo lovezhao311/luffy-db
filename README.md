@@ -1,5 +1,11 @@
 ## luffyzhao 数据库操作类
 `luffyzhao-db`是一个数据库操作类，支持各种数据库的增、删、改、查、执行存储过程等。目前还只支持`mysql`。欢迎star、fork、试用 
+
+
+* 支持mysql
+* 支持分布式布局
+* 支持读写分离
+
 #### 安装
  ```
     composer require luffyzhao/luffy-db
