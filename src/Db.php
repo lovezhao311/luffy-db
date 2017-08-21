@@ -7,10 +7,8 @@ class Db
 {
     //  数据库连接实例
     private static $instance = null;
-    // 查询次数
-    public static $queryTimes = 0;
-    // 执行次数
-    public static $executeTimes = 0;
+    // sql语句
+    private static $recordSql = [];
 
     /**
      * 数据库初始化 并取得数据库类实例
@@ -35,7 +33,27 @@ class Db
         }
         return self::$instance;
     }
-
+    /**
+     * 记录sql语句
+     * @method   recordSql
+     * @DateTime 2017-08-21T15:28:36+0800
+     * @param    [type]                   $sql [description]
+     * @return   [type]                        [description]
+     */
+    public static function recordSql($sql)
+    {
+        self::$recordSql[time()][] = $sql;
+    }
+    /**
+     * 获取sql日志
+     * @method   getRecordSql
+     * @DateTime 2017-08-21T15:30:33+0800
+     * @return   [type]                   [description]
+     */
+    public static function getRecordSql()
+    {
+        return self::$recordSql;
+    }
     /**
      * 数据库连接参数解析
      * @static
@@ -82,4 +100,5 @@ class Db
         }
         return $dsn;
     }
+
 }

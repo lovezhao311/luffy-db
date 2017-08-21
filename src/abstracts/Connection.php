@@ -187,13 +187,7 @@ abstract class Connection
                 if (empty($config['dsn'])) {
                     $config['dsn'] = $this->parseDsn($config);
                 }
-                if ($config['debug']) {
-                    $startTime = microtime(true);
-                }
                 $this->links[$linkNum] = new PDO($config['dsn'], $config['username'], $config['password'], $this->params);
-                if ($config['debug']) {
-                    // 可以加日志什么的
-                }
             } catch (\PDOException $e) {
                 if ($autoConnection) {
                     return $this->connect($autoConnection, $linkNum);
@@ -203,27 +197,6 @@ abstract class Connection
             }
         }
         return $this->links[$linkNum];
-    }
-
-    /**
-     * 获得查询次数
-     * @access public
-     * @param boolean $execute 是否包含所有查询
-     * @return integer
-     */
-    public function getQueryTimes($execute = false)
-    {
-        return $execute ? Db::$queryTimes + Db::$executeTimes : Db::$queryTimes;
-    }
-
-    /**
-     * 获得执行次数
-     * @access public
-     * @return integer
-     */
-    public function getExecuteTimes()
-    {
-        return Db::$executeTimes;
     }
 
     /**
@@ -255,7 +228,6 @@ abstract class Connection
             $this->free();
         }
 
-        Db::$queryTimes++;
         try {
             // 预处理
             if (empty($this->PDOStatement)) {
@@ -271,6 +243,10 @@ abstract class Connection
             }
             // 执行查询
             $this->PDOStatement->execute();
+            // debug
+            if ($this->config['debug']) {
+                Db::recordSql($this->getLastsql());
+            }
             // 返回结果集
             return $this->getResult($pdo, $procedure);
         } catch (\PDOException $e) {
@@ -305,7 +281,6 @@ abstract class Connection
             $this->free();
         }
 
-        Db::$executeTimes++;
         try {
             // 预处理
             if (empty($this->PDOStatement)) {
@@ -321,9 +296,12 @@ abstract class Connection
             }
             // 执行语句
             $this->PDOStatement->execute();
+            // debug
+            if ($this->config['debug']) {
+                Db::recordSql($this->getLastsql());
+            }
 
-            $numRows = $this->PDOStatement->rowCount();
-            return $numRows;
+            return $this->PDOStatement->rowCount();
         } catch (\PDOException $e) {
             throw new SqlException($e->getMessage(), $this->config, $this->getLastsql(), $bind, $e->getCode());
         }
@@ -350,6 +328,10 @@ abstract class Connection
                     $this->parseSavepoint('trans' . $this->transTimes)
                 );
             }
+            // debug
+            if ($this->config['debug']) {
+                Db::recordSql('BEGIN');
+            }
         } catch (\PDOException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -370,7 +352,10 @@ abstract class Connection
         if (1 == $this->transTimes) {
             $this->linkID->commit();
         }
-
+        // debug
+        if ($this->config['debug']) {
+            Db::recordSql('COMMIT');
+        }
         --$this->transTimes;
     }
 
@@ -391,7 +376,10 @@ abstract class Connection
                 $this->parseSavepointRollBack('trans' . $this->transTimes)
             );
         }
-
+        // debug
+        if ($this->config['debug']) {
+            Db::recordSql('ROLLBACK');
+        }
         $this->transTimes = max(0, $this->transTimes - 1);
     }
 
