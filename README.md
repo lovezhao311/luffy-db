@@ -13,7 +13,7 @@
  ```
     或者
 ```
-    git clone git@github.com:meolu/walle-web.git
+    git@github.com:lovezhao311/luffy-db.git
 ```
 #### 环境要求
 * php 7.0 +
