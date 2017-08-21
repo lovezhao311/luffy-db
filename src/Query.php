@@ -538,7 +538,7 @@ class Query
      * @param boolean $getLastInsID 返回自增主键
      * @return   [type]                            [description]
      */
-    public function insert(bool $execute = true, bool $replace = false, bool $getLastInsID = true)
+    public function insert(bool $execute = true, bool $getLastInsID = true, bool $replace = false)
     {
         $options = $this->parseExpress();
         // 生成UPDATE SQL语句

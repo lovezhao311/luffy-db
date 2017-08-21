@@ -62,6 +62,27 @@ abstract class Builder
     }
 
     /**
+     * value分析
+     * @access protected
+     * @param mixed     $value
+     * @param string    $field
+     * @return string|array
+     */
+    protected function parseValue($value, $field = '')
+    {
+        if (is_string($value)) {
+            $value = strpos($value, ':') === 0 && $this->query->isBind(substr($value, 1)) ? $value : $this->connection->quote($value);
+        } elseif (is_array($value)) {
+            $value = array_map([$this, 'parseValue'], $value);
+        } elseif (is_bool($value)) {
+            $value = $value ? '1' : '0';
+        } elseif (is_null($value)) {
+            $value = 'null';
+        }
+        return $value;
+    }
+
+    /**
      * 生成查询SQL
      * @access public
      * @param array $options 表达式
@@ -258,15 +279,34 @@ abstract class Builder
                     }
                 } else if (is_array($value)) {
                     list($field, $op, $condition) = $value;
+                    $op = strtoupper($op);
+                    $field = $this->parseKey($field);
                     $bindField = 'where_' . str_replace(['.', '-'], '_', $field);
                     if ($this->query->isBind($bindField)) {
                         $bindField .= uniqid();
                     }
-                    $this->query->bind($bindField, $condition, PDO::PARAM_STR);
 
-                    $str[] = ' ' . $key . ' ' . $field . ' ' . $op . ' :' . $bindField;
+                    if (in_array($op, ['=', '<>', '>', '>=', '<', '<='])) {
+                        // 比较运算
+                        $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' :' . $bindField . ' ) ';
+                        $this->query->bind($bindField, $this->parseValue($condition), PDO::PARAM_STR);
+                    } elseif (in_array($op, ['LIKE', 'NOT LIKE'])) {
+                        // 模糊匹配
+                        $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ' . $this->parseValue($condition) . ' ) ';
+                    } elseif (in_array($op, ['NOT NULL', 'NULL'])) {
+                        // NULL 查询
+                        $str[] = ' ' . $key . ' ( ' . $field . ' IS ' . $op . ' ) ';
+                    } elseif (in_array($op, ['NOT IN', 'IN'])) {
+                        // IN 查询
+                        if (is_array($condition)) {
+                            $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ( ' . implode(',', $this->parseValue($condition)) . ' ) ) ';
+                        } else {
+                            $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ( ' . $this->parseValue($condition) . ' ) ) ';
+                        }
+                    }
                 } else {
-                    $str[] = ' ' . $key . ' ' . $value;
+                    // 表达式
+                    $str[] = ' ' . $key . ' ( ' . $value . ' ) ';
                 }
             }
             $whereStr .= empty($whereStr) ? substr(implode(' ', $str), strlen($key) + 1) : implode(' ', $str);
