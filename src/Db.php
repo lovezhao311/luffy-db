@@ -1,10 +1,12 @@
 <?php
 namespace luffyzhao\db;
 
+use luffyzhao\db\abstracts\Connection;
+
 class Db
 {
     //  数据库连接实例
-    private static $instance = [];
+    private static $instance = null;
     // 查询次数
     public static $queryTimes = 0;
     // 执行次数
@@ -19,26 +21,19 @@ class Db
      * @return Connection
      * @throws Exception
      */
-    public static function connect(array $config = [], bool $name = false)
+    public static function connect(array $config)
     {
-        if (false === $name) {
-            $name = md5(serialize($config));
-        }
-        if (true === $name || !isset(self::$instance[$name])) {
+        if (empty(self::$instance)) {
             // 解析连接参数 支持数组和字符串
             $options = self::parseConfig($config);
             if (empty($options['type'])) {
                 throw new \InvalidArgumentException('Underfined db type');
             }
             $class = false !== strpos($options['type'], '\\') ? $options['type'] : '\\luffyzhao\\db\\connector\\' . ucwords($options['type']);
-            // 记录初始化信息
-            if (true === $name) {
-                return new $class($options);
-            } else {
-                self::$instance[$name] = new $class($options);
-            }
+
+            self::$instance = new $class($options);
         }
-        return self::$instance[$name];
+        return self::$instance;
     }
 
     /**
@@ -86,12 +81,5 @@ class Db
             $dsn['params'] = [];
         }
         return $dsn;
-    }
-
-    // 调用驱动类的方法
-    public static function __callStatic($method, $params)
-    {
-        // 自动初始化数据库
-        return call_user_func_array([self::connect(), $method], $params);
     }
 }
