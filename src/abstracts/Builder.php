@@ -1,7 +1,6 @@
 <?php
 namespace luffyzhao\db\abstracts;
 
-use luffyzhao\db\Query;
 use PDO;
 
 abstract class Builder

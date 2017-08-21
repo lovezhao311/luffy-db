@@ -1,5 +1,5 @@
 <?php
-namespace luffyzhao\db;
+namespace luffyzhao\db\abstracts;
 
 use luffyzhao\db\abstracts\Connection;
 use PDO;

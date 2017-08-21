@@ -3,7 +3,6 @@ namespace luffyzhao\db\abstracts;
 
 use luffyzhao\db\Db;
 use luffyzhao\db\exception\SqlException;
-use luffyzhao\db\Query;
 use PDO;
 
 /**
