@@ -4,6 +4,10 @@ namespace luffyzhao\db\abstracts;
 use luffyzhao\db\abstracts\Connection;
 use PDO;
 
+/**
+ * Class Query
+ * @package luffyzhao
+ */
 class Query
 {
     /**
@@ -214,7 +218,6 @@ class Query
 
     /**
      * 获取Join表名及别名 支持
-     * ['prefix_table或者子查询'=>'alias'] 'prefix_table alias' 'table alias'
      * @access public
      * @param array|string $join
      * @return array|string
@@ -775,19 +778,43 @@ class Query
         return $pk;
     }
 
-    // 获取当前数据表字段信息
+    /**
+     * 获取当前数据表字段信息
+     * @method   getTableFields
+     * @DateTime 2017-08-21T12:03:22+0800
+     * @param    array $options 查询参数
+     * @return   array
+     * @throws SqlException
+     * @throws PDOException
+     */
     public function getTableFields($options)
     {
         return $this->getTableInfo($options['table'], 'fields');
     }
 
-    // 获取当前数据表字段类型
+    /**
+     * 获取当前数据表字段类型
+     * @method   getFieldsType
+     * @DateTime 2017-08-21T12:04:15+0800
+     * @param    array $options 查询参数
+     * @return   array
+     * @throws SqlException
+     * @throws PDOException
+     */
     public function getFieldsType($options)
     {
         return $this->getTableInfo($options['table'], 'type');
     }
 
-    // 获取当前数据表绑定信息
+    /**
+     * 获取当前数据表绑定信息
+     * @method   getFieldsBind
+     * @DateTime 2017-08-21T12:05:43+0800
+     * @param    array $options 查询参数
+     * @return   array
+     * @throws SqlException
+     * @throws PDOException
+     */
     public function getFieldsBind($options)
     {
         $types = $this->getFieldsType($options);
