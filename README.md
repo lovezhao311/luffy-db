@@ -11,7 +11,7 @@
 #### 环境要求
 * php 7.0 +
 #### 使用方法
-```
+```php
     require __DIR__. '/../vendor/autoload.php';
     use luffyzhao\db\Db;
     
