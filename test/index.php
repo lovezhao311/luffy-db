@@ -9,7 +9,7 @@ $database = [
     // 数据库类型
     'type' => 'mysql',
     // 服务器地址
-    'hostname' => 'localhost,localhost',
+    'hostname' => '127.0.0.1,127.0.0.1',
     // 数据库名
     'database' => 'test,test1',
     // 用户名
@@ -23,9 +23,11 @@ $database = [
     // 读写分享
     'rw_separate' => true,
     // 调试
-    'debug' => true,
+    'debug' => function($messgaes){
+        echo "[".date('Y-m-d H:i:s')."]" . $messgaes ."\n";
+    },
 ];
-$db = Db::connect($database);
+$db = new Db($database);
 //插入数据
 $res = $db->table('test_db')->data('name', '战非')->data('phone', '15215214578')->insert();
 
@@ -36,4 +38,3 @@ $db->startTrans();
 $res = $db->table('test_db')->findAll();
 $db->commit();
 
-print_r(Db::getRecordSql());

@@ -244,8 +244,8 @@ abstract class Connection
             // 执行查询
             $this->PDOStatement->execute();
             // debug
-            if ($this->config['debug']) {
-                Db::recordSql($this->getLastsql());
+            if ($this->config['debug'] instanceof \Closure) {
+                $this->config['debug']($this->getLastsql());
             }
             // 返回结果集
             return $this->getResult($pdo, $procedure);
@@ -297,8 +297,8 @@ abstract class Connection
             // 执行语句
             $this->PDOStatement->execute();
             // debug
-            if ($this->config['debug']) {
-                Db::recordSql($this->getLastsql());
+            if ($this->config['debug'] instanceof \Closure) {
+                $this->config['debug']($this->getLastsql());
             }
 
             return $this->PDOStatement->rowCount();
@@ -329,8 +329,8 @@ abstract class Connection
                 );
             }
             // debug
-            if ($this->config['debug']) {
-                Db::recordSql('BEGIN');
+            if ($this->config['debug'] instanceof \Closure) {
+                $this->config['debug']('begin');
             }
         } catch (\PDOException $e) {
             throw $e;
@@ -353,8 +353,8 @@ abstract class Connection
             $this->linkID->commit();
         }
         // debug
-        if ($this->config['debug']) {
-            Db::recordSql('COMMIT');
+        if ($this->config['debug'] instanceof \Closure) {
+            $this->config['debug']('commit');
         }
         --$this->transTimes;
     }
@@ -377,8 +377,8 @@ abstract class Connection
             );
         }
         // debug
-        if ($this->config['debug']) {
-            Db::recordSql('ROLLBACK');
+        if ($this->config['debug'] instanceof \Closure) {
+            $this->config['debug']('rollback');
         }
         $this->transTimes = max(0, $this->transTimes - 1);
     }

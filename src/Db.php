@@ -5,10 +5,7 @@ use luffyzhao\db\abstracts\Connection;
 
 class Db
 {
-    //  数据库连接实例
-    private static $instance = null;
-    // sql语句
-    private static $recordSql = [];
+    protected $db = null;
 
     /**
      * 数据库初始化 并取得数据库类实例
@@ -19,41 +16,26 @@ class Db
      * @return Connection
      * @throws Exception
      */
-    public static function connect(array $config)
+    public function __construct(array $config)
     {
-        if (empty(self::$instance)) {
-            // 解析连接参数 支持数组和字符串
-            $options = self::parseConfig($config);
-            if (empty($options['type'])) {
-                throw new \InvalidArgumentException('Underfined db type');
-            }
-            $class = false !== strpos($options['type'], '\\') ? $options['type'] : '\\luffyzhao\\db\\connector\\' . ucwords($options['type']);
-
-            self::$instance = new $class($options);
+        // 解析连接参数 支持数组和字符串
+        $options = $this->parseConfig($config);
+        if (empty($options['type'])) {
+            throw new \InvalidArgumentException('Underfined db type');
         }
-        return self::$instance;
+        $class = false !== strpos($options['type'], '\\') ? $options['type'] : '\\luffyzhao\\db\\connector\\' . ucwords($options['type']);
+        $this->db = new $class($options);
     }
+
     /**
-     * 记录sql语句
-     * @method   recordSql
-     * @DateTime 2017-08-21T15:28:36+0800
-     * @param    [type]                   $sql [description]
-     * @return   [type]                        [description]
+     * @param $name
+     * @param $arguments
      */
-    public static function recordSql($sql)
+    public function __call($name, $arguments)
     {
-        self::$recordSql[time()][] = $sql;
+        return call_user_func_array([$this->db, $name], $arguments);
     }
-    /**
-     * 获取sql日志
-     * @method   getRecordSql
-     * @DateTime 2017-08-21T15:30:33+0800
-     * @return   [type]                   [description]
-     */
-    public static function getRecordSql()
-    {
-        return self::$recordSql;
-    }
+
     /**
      * 数据库连接参数解析
      * @static
@@ -61,10 +43,10 @@ class Db
      * @param mixed $config
      * @return array
      */
-    private static function parseConfig($config)
+    private function parseConfig($config)
     {
         if (is_string($config)) {
-            return self::parseDsn($config);
+            return $this->parseDsn($config);
         } else {
             return $config;
         }
@@ -77,7 +59,7 @@ class Db
      * @param string $dsnStr
      * @return array
      */
-    private static function parseDsn($dsnStr)
+    private function parseDsn($dsnStr)
     {
         $info = parse_url($dsnStr);
         if (!$info) {
