@@ -279,8 +279,9 @@ abstract class Builder
                 } else if (is_array($value)) {
                     list($field, $op, $condition) = $value;
                     $op = strtoupper($op);
-                    $field = $this->parseKey($field);
                     $bindField = 'where_' . str_replace(['.', '-'], '_', $field);
+                    $field = $this->parseKey($field);
+
                     if ($this->query->isBind($bindField)) {
                         $bindField .= uniqid();
                     }
