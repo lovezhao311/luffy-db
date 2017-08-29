@@ -261,6 +261,8 @@ abstract class Builder
             $where = [];
         }
 
+
+
         if ($where instanceof Query) {
             return $this->buildWhere($where->getOptions('where'), $options);
         }
@@ -280,16 +282,17 @@ abstract class Builder
                     list($field, $op, $condition) = $value;
                     $op = strtoupper($op);
 
-                    $bindField = 'where_' . str_replace(['.', '-'], '_', $field);
-                    $field = $this->parseKey($field);
-                    if ($this->query->isBind($bindField)) {
-                        $bindField .= uniqid();
-                    }
+//                    $bindField = 'where_' . str_replace(['.', '-'], '_', $field);
+                    $field = $this->parseKey($field,$options);
+//                    if ($this->query->isBind($bindField)) {
+//                        $bindField .= uniqid();
+//                    }
 
                     if (in_array($op, ['=', '<>', '>', '>=', '<', '<='])) {
                         // 比较运算
-                        $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' :' . $bindField . ' ) ';
-                        $this->query->bind($bindField, $this->parseValue($condition), PDO::PARAM_STR);
+                        $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ' . $this->parseValue($condition) . ' ) ';
+
+//                        $this->query->bind($bindField, $this->parseValue($condition), PDO::PARAM_STR);
                     } elseif (in_array($op, ['LIKE', 'NOT LIKE'])) {
                         // 模糊匹配
                         $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ' . $this->parseValue($condition) . ' ) ';

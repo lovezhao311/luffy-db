@@ -188,6 +188,9 @@ abstract class Connection
                     $config['dsn'] = $this->parseDsn($config);
                 }
                 $this->links[$linkNum] = new PDO($config['dsn'], $config['username'], $config['password'], $this->params);
+
+                // debug
+                $this->debug("dsn:{$config['dsn']} username:{$config['username']} password:{$config['password']}");
             } catch (\PDOException $e) {
                 if ($autoConnection) {
                     return $this->connect($autoConnection, $linkNum);
@@ -244,9 +247,7 @@ abstract class Connection
             // 执行查询
             $this->PDOStatement->execute();
             // debug
-            if ($this->config['debug'] instanceof \Closure) {
-                $this->config['debug']($this->getLastsql());
-            }
+            $this->debug($this->getLastsql());
             // 返回结果集
             return $this->getResult($pdo, $procedure);
         } catch (\PDOException $e) {
@@ -297,9 +298,7 @@ abstract class Connection
             // 执行语句
             $this->PDOStatement->execute();
             // debug
-            if ($this->config['debug'] instanceof \Closure) {
-                $this->config['debug']($this->getLastsql());
-            }
+            $this->debug($this->getLastsql());
 
             return $this->PDOStatement->rowCount();
         } catch (\PDOException $e) {
@@ -329,9 +328,7 @@ abstract class Connection
                 );
             }
             // debug
-            if ($this->config['debug'] instanceof \Closure) {
-                $this->config['debug']('begin');
-            }
+            $this->debug('begin');
         } catch (\PDOException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -377,9 +374,7 @@ abstract class Connection
             );
         }
         // debug
-        if ($this->config['debug'] instanceof \Closure) {
-            $this->config['debug']('rollback');
-        }
+        $this->debug('rollback');
         $this->transTimes = max(0, $this->transTimes - 1);
     }
 
@@ -639,6 +634,16 @@ abstract class Connection
     }
 
     /**
+     * debug
+     * @param $messgaes
+     */
+    public function debug($messgaes){
+        // debug
+        if ($this->config['debug'] instanceof \Closure) {
+            $this->config['debug']($messgaes);
+        }
+    }
+    /**
      * 关闭数据库（或者重新连接）
      * @access public
      * @return $this
@@ -649,6 +654,7 @@ abstract class Connection
         $this->linkWrite = null;
         $this->linkRead = null;
         $this->links = [];
+        $this->debug('db close');
         return $this;
     }
 

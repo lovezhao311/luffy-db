@@ -961,4 +961,11 @@ class Query
         return $this->connection->getConfig($name);
     }
 
+    /**
+     *
+     */
+    public function __destruct()
+    {
+        $this->connection->debug('query destruct');
+    }
 }

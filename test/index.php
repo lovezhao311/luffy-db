@@ -23,8 +23,8 @@ $database = [
     // 读写分享
     'rw_separate' => true,
     // 调试
-    'debug' => function($messgaes){
-        echo "[".date('Y-m-d H:i:s')."]" . $messgaes ."\n";
+    'debug' => function ($messgaes) {
+        echo "[" . date('Y-m-d H:i:s') . "]" . $messgaes . "\n";
     },
 ];
 $db = new Db($database);
@@ -32,9 +32,8 @@ $db = new Db($database);
 $res = $db->table('test_db')->data('name', '战非')->data('phone', '15215214578')->insert();
 
 // 没有数据
-$res = $db->table('test_db')->findAll();
+$res = $db->table('test_db')->where('phone', '=', '15215214578')->findAll();
 // 有数据 (事务开始之后拿主库里的数据)
 $db->startTrans();
 $res = $db->table('test_db')->findAll();
 $db->commit();
-

@@ -19,9 +19,9 @@
 * php 7.0 +
 #### 使用方法
 ```php
-    require __DIR__. '/../vendor/autoload.php';
+    require __DIR__ . '/../vendor/autoload.php';
     use luffyzhao\db\Db;
-    
+
     /**
      * 测试读写分离和分布式
      */
@@ -29,7 +29,7 @@
         // 数据库类型
         'type' => 'mysql',
         // 服务器地址
-        'hostname' => 'localhost,localhost',
+        'hostname' => '127.0.0.1,127.0.0.1',
         // 数据库名
         'database' => 'test,test1',
         // 用户名
@@ -41,21 +41,21 @@
         // 分布式
         'deploy' => 1,
         // 读写分享
-        'rw_separate' => true
+        'rw_separate' => true,
+        // 调试
+        'debug' => function ($messgaes) {
+            echo "[" . date('Y-m-d H:i:s') . "]" . $messgaes . "\n";
+        },
     ];
-    $db = Db::connect($database);
-    
+    $db = new Db($database);
+    //插入数据
     $res = $db->table('test_db')->data('name', '战非')->data('phone', '15215214578')->insert();
-    
-    print "添加成功,ID:" . $res . "\n";
-    
-    $res = $db->table('test_db')->findAll();
-    // 没有数据 
-    print_r($res);
-    
+
+    // 没有数据
+    $res = $db->table('test_db')->where('phone', '=', '15215214578')->findAll();
     // 有数据 (事务开始之后拿主库里的数据)
     $db->startTrans();
     $res = $db->table('test_db')->findAll();
     $db->commit();
-    print_r($res);
+
 ```

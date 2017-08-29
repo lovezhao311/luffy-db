@@ -83,4 +83,8 @@ class Db
         return $dsn;
     }
 
+    public function __destruct()
+    {
+        $this->db = null;
+    }
 }
