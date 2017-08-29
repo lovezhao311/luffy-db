@@ -637,7 +637,8 @@ abstract class Connection
      * debug
      * @param $messgaes
      */
-    public function debug($messgaes){
+    public function debug($messgaes)
+    {
         // debug
         if ($this->config['debug'] instanceof \Closure) {
             $this->config['debug']($messgaes);
@@ -691,10 +692,10 @@ abstract class Connection
      */
     abstract public function getFields($tableName);
     /**
-     * 析构方法
+     *
      * @access public
      */
-    public function __destruct()
+    public function destruct()
     {
         // 释放查询
         if ($this->PDOStatement) {
@@ -702,5 +703,12 @@ abstract class Connection
         }
         // 关闭连接
         $this->close();
+    }
+    /**
+     * 析构方法
+     */
+    public function __destruct()
+    {
+        $this->destruct();
     }
 }
