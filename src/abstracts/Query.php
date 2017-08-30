@@ -962,5 +962,6 @@ class Query
     public function __destruct()
     {
         $this->connection->debug('query destruct');
+        $this->builder = null;
     }
 }
