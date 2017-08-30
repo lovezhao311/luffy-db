@@ -735,11 +735,6 @@ class Query
         list($guid) = explode(' ', $tableName);
         $db = $this->getConfig('database');
 
-        if (!strpos($guid, '.')) {
-            $schema = $db . '.' . $guid;
-        } else {
-            $schema = $guid;
-        }
         $info = $this->connection->getFields($guid);
         $fields = array_keys($info);
         $bind = $type = [];

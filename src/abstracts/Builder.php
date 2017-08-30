@@ -511,4 +511,9 @@ abstract class Builder
         return !empty($comment) ? ' /* ' . $comment . ' */' : '';
     }
 
+    public function __destruct()
+    {
+        $this->connection = null;
+        $this->query = null;
+    }
 }

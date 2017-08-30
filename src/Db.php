@@ -85,6 +85,6 @@ class Db
 
     public function __destruct()
     {
-        $this->db->destruct();
+        $this->db = null;
     }
 }
