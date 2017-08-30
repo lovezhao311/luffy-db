@@ -261,6 +261,8 @@ abstract class Builder
             $where = [];
         }
 
+
+
         if ($where instanceof Query) {
             return $this->buildWhere($where->getOptions('where'), $options);
         }
@@ -281,11 +283,17 @@ abstract class Builder
                     list($field, $op, $condition) = $value;
                     $op = strtoupper($op);
 
-                    $field = $this->parseKey($field, $options);
+//                    $bindField = 'where_' . str_replace(['.', '-'], '_', $field);
+                    $field = $this->parseKey($field,$options);
+//                    if ($this->query->isBind($bindField)) {
+//                        $bindField .= uniqid();
+//                    }
 
                     if (in_array($op, ['=', '<>', '>', '>=', '<', '<='])) {
                         // 比较运算
                         $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ' . $this->parseValue($condition) . ' ) ';
+
+//                        $this->query->bind($bindField, $this->parseValue($condition), PDO::PARAM_STR);
                     } elseif (in_array($op, ['LIKE', 'NOT LIKE'])) {
                         // 模糊匹配
                         $str[] = ' ' . $key . ' ( ' . $field . ' ' . $op . ' ' . $this->parseValue($condition) . ' ) ';
@@ -479,7 +487,7 @@ abstract class Builder
     {
         $query = new Query($this->connection);
         call_user_func_array($call, [ & $query]);
-        $sql = $query->buildSql($show);
+        $sql =  $query->buildSql($show);
         unset($query);
         return $sql;
     }
@@ -508,7 +516,5 @@ abstract class Builder
 
     public function __destruct()
     {
-        $this->connection = null;
-        $this->query = null;
     }
 }

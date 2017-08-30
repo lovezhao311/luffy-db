@@ -18,6 +18,10 @@ abstract class Connection
      */
     protected $PDOStatement;
     /**
+     * @var null
+     */
+    protected $query = null;
+    /**
      * 当前连接实例
      * @var null
      */
@@ -125,7 +129,10 @@ abstract class Connection
      */
     protected function getQuery()
     {
-        return new Query($this);
+        if($this->query == null){
+            $this->query = new Query($this);
+        }
+        return $this->query;
     }
     /**
      * 获取当前连接器类对应的Builder类
@@ -655,6 +662,7 @@ abstract class Connection
         $this->linkWrite = null;
         $this->linkRead = null;
         $this->links = [];
+        $this->query = null;
         $this->debug('db close');
         return $this;
     }
@@ -692,10 +700,9 @@ abstract class Connection
      */
     abstract public function getFields($tableName);
     /**
-     *
-     * @access public
+     * 析构方法
      */
-    public function destruct()
+    public function __destruct()
     {
         // 释放查询
         if ($this->PDOStatement) {
@@ -703,12 +710,5 @@ abstract class Connection
         }
         // 关闭连接
         $this->close();
-    }
-    /**
-     * 析构方法
-     */
-    public function __destruct()
-    {
-        $this->destruct();
     }
 }
